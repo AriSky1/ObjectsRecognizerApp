@@ -1,6 +1,12 @@
 from dash import Dash, dcc, html, Input, Output, State
 from flask import Flask, render_template, Response
 import dash_bootstrap_components as dbc
+from ultralytics import YOLO
+from gen_frames import gen_frames_yolo
+
+
+
+
 
 
 external_stylesheets = [
@@ -50,9 +56,30 @@ def load_stream(n_clicks):
     if n_clicks > 0:
         # Your code to start the object recognition stream goes here
         # Replace the following line with your implementation
-        return html.Div("Object recognition stream has started.")
+        # return html.Div("Object recognition stream has started.")
+        return html.Div([
+
+            html.Div([html.Img(id='stream', src="/stream")])
+        ])
+
+
+
     else:
         return html.Div()
+
+
+
+
+
+
+@server.route('/stream')
+def stream():
+    # url = 'https://www.youtube.com/watch?v=IBFCV4zhMGc' #shibuya static
+    url = 0
+    model = YOLO('yolov8n.pt')
+    return Response(gen_frames_yolo(model),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 
 
