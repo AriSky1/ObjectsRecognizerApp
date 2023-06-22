@@ -6,8 +6,17 @@ from gen_frames import gen_frames_yolo
 import cv2
 from ultralytics.yolo.utils.plotting import Annotator
 import matplotlib.pyplot as plt
+import random
+import colorsys
 
 model = YOLO("yolov8n.pt")
+
+# Generate unique colors for each label
+def generate_label_colors(num_labels):
+    hsv_colors = [(i / num_labels, 1, 1) for i in range(num_labels)]
+    rgb_colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv_colors))
+    bgr_colors = [(int(r * 255), int(g * 255), int(b * 255)) for (r, g, b) in rgb_colors]
+    return bgr_colors
 
 def gen_frames_yolo():
 
@@ -17,6 +26,7 @@ def gen_frames_yolo():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
+    label_colors = generate_label_colors(len(model.names))
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -28,11 +38,16 @@ def gen_frames_yolo():
 
             annotator = Annotator(frame)
 
+
             boxes = r.boxes
             for box in boxes:
                 b = box.xyxy[0]  # get box coordinates in (top, left, bottom, right) format
                 c = box.cls
-                annotator.box_label(b, model.names[int(c)])
+                label = model.names[int(c)]
+                color = label_colors[int(c)]
+
+
+                annotator.box_label(b, model.names[int(c)],color=color)
 
         frame = annotator.result()
 
