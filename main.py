@@ -3,9 +3,35 @@ from flask import Flask, render_template, Response
 import dash_bootstrap_components as dbc
 from ultralytics import YOLO
 from gen_frames import gen_frames_yolo
+import cv2
+
+def gen_frames_yolo():
+
+
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 
 
+    while cap.isOpened():
+        ret, frame = cap.read()
+        # model = YOLO("yolov8n.pt")
+        # results = model(frame)  # Perform object detection on the frame
+        # print(results)
+        # # Draw bounding boxes on the frame
+        # for label, confidence, bbox in results:
+        #
+        #     x1, y1, x2, y2 = bbox
+        #     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+        #     cv2.putText(frame, f'{label}: {confidence:.2f}', (int(x1), int(y1) - 10),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+        #
+        frame = cv2.imencode('.jpg', frame)[1].tobytes()
+        yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        # key = cv2.waitKey(20)
+        # if key == 27:
+        #     break
 
 
 
@@ -33,7 +59,8 @@ app.layout = html.Div(
                             style=style_text
                         ),
                         html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success'),
-                        html.Div(id='container-stream')
+                        html.Div(id='container-stream'),
+                        html.Img(id='stream', style={'width': '100%', 'height': 'auto', 'display': 'none'})
                     ],
                     className='my-5 text-center'
                 )
@@ -47,23 +74,18 @@ app.layout = html.Div(
 
 @app.callback(
     Output('container-stream', 'children'),
-    Input('start_btn', 'n_clicks')
+    Input('start_btn', 'n_clicks'),
+
 
 )
 
 
 def load_stream(n_clicks):
     if n_clicks > 0:
-        # Your code to start the object recognition stream goes here
-        # Replace the following line with your implementation
-        # return html.Div("Object recognition stream has started.")
         return html.Div([
 
-            html.Div([html.Img(id='stream', src="/stream")])
+            html.Img(id='stream', src="/stream")
         ])
-
-
-
     else:
         return html.Div()
 
@@ -72,12 +94,15 @@ def load_stream(n_clicks):
 
 
 
+
+
+
+
+
+
 @server.route('/stream')
 def stream():
-    # url = 'https://www.youtube.com/watch?v=IBFCV4zhMGc' #shibuya static
-    url = 0
-    model = YOLO('yolov8n.pt')
-    return Response(gen_frames_yolo(model),
+    return Response(gen_frames_yolo(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
