@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from ultralytics import YOLO
 from gen_frames import gen_frames_yolo
 import cv2
+from ultralytics.yolo.utils.plotting import Annotator
 
 def gen_frames_yolo():
 
@@ -16,9 +17,9 @@ def gen_frames_yolo():
 
     while cap.isOpened():
         ret, frame = cap.read()
-        # model = YOLO("yolov8n.pt")
-        # results = model(frame)  # Perform object detection on the frame
-        # print(results)
+        model = YOLO("yolov8n.pt")
+        results = model(frame)  # Perform object detection on the frame
+        print(results)
         # # Draw bounding boxes on the frame
         # for label, confidence, bbox in results:
         #
@@ -26,8 +27,26 @@ def gen_frames_yolo():
         #     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
         #     cv2.putText(frame, f'{label}: {confidence:.2f}', (int(x1), int(y1) - 10),
         #                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-        #
+        # #
+
+        for r in results:
+
+            annotator = Annotator(frame)
+
+            boxes = r.boxes
+            for box in boxes:
+                b = box.xyxy[0]  # get box coordinates in (top, left, bottom, right) format
+                c = box.cls
+                annotator.box_label(b, model.names[int(c)])
+
+        frame = annotator.result()
+
         frame = cv2.imencode('.jpg', frame)[1].tobytes()
+
+
+
+
+
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         # key = cv2.waitKey(20)
         # if key == 27:
