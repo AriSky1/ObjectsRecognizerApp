@@ -5,30 +5,25 @@ from ultralytics import YOLO
 from gen_frames import gen_frames_yolo
 import cv2
 from ultralytics.yolo.utils.plotting import Annotator
+import matplotlib.pyplot as plt
+
+model = YOLO("yolov8n.pt")
 
 def gen_frames_yolo():
 
 
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
 
     while cap.isOpened():
         ret, frame = cap.read()
-        model = YOLO("yolov8n.pt")
-        results = model(frame)  # Perform object detection on the frame
-        print(results)
-        # # Draw bounding boxes on the frame
-        # for label, confidence, bbox in results:
-        #
-        #     x1, y1, x2, y2 = bbox
-        #     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-        #     cv2.putText(frame, f'{label}: {confidence:.2f}', (int(x1), int(y1) - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-        # #
 
+        # model.predict(source="0", show=True)
+        results = model(frame)  # Perform object detection on the frame
+        # print(results)
         for r in results:
 
             annotator = Annotator(frame)
@@ -77,9 +72,11 @@ app.layout = html.Div(
                             children='Recognize multiple objects from your live web cam stream.',
                             style=style_text
                         ),
-                        html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success'),
+                        html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success',style={"margin-bottom": "30px"}),
+
                         html.Div(id='container-stream'),
-                        html.Img(id='stream', style={'width': '100%', 'height': 'auto', 'display': 'none'})
+
+                        html.Img(id='stream', style={'width': '50px', 'height': '50px', 'display': 'none'})
                     ],
                     className='my-5 text-center'
                 )
