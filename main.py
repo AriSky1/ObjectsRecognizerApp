@@ -58,23 +58,19 @@ def gen_frames_yolo():
 
 
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        # key = cv2.waitKey(20)
-        # if key == 27:
-        #     break
 
 
 
-external_stylesheets = [
-    'https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@600&display=swap',
-     dbc.themes.CYBORG
-]
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 
 style_title={'color': 'grey','fontSize': 30,'textAlign': 'center', 'letter-spacing':'2px', 'padding-left': '20px','padding-top': '20px'}
 style_text={'color': 'grey','fontSize': 18,'textAlign': 'center','font_family': 'Segoe UI', 'padding-bottom':'20px','padding-left': '20px'}
-style_btn = {'color': 'black','font-weight': 'bold', 'width':'200px', 'height':'100px',}
+style_btn = {'color': 'black','font-weight': 'bold', 'width':'100px', 'height':'50px',}
 
 server = Flask(__name__)
 app = Dash(__name__, server=server,external_stylesheets=external_stylesheets)
+
 
 app.layout = html.Div(
     [
@@ -87,7 +83,10 @@ app.layout = html.Div(
                             children='Recognize multiple objects from your live web cam stream.',
                             style=style_text
                         ),
-                        html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success',style={"margin-bottom": "30px"}),
+                        html.Div(
+                            html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success', style=style_btn),
+                            style={'display': 'flex', 'justify-content': 'center', 'margin-bottom': '30px'}
+                        ),
 
                         html.Div(id='container-stream'),
 
@@ -96,11 +95,18 @@ app.layout = html.Div(
                     className='my-5 text-center'
                 )
             ],
-            fluid=True
+            fluid=True,
+            style={"height": "100vh", "display": "flex", "flex-direction": "column", "align-items": "center"}
         )
     ],
-    style={"display": "flex", "flex-direction": "column", "align-items": "center"}
+    style={"display": "flex", "flex-direction": "column", "align-items": "center", "background-color": "white"}
 )
+
+
+
+
+
+
 
 
 @app.callback(
