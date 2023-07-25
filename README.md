@@ -2,5 +2,9 @@
 
 
 
-https://github.com/AriSky1/ObjectsRecognizerApp/assets/105871709/5e3bb80c-4575-4aa2-b977-8f04fdca3c39
+
+https://github.com/AriSky1/ObjectsRecognizerApp/assets/105871709/3964c958-a9d1-4f8b-899c-624a225fa865
+
+
+
 
