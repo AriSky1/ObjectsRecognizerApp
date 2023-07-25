@@ -1,69 +1,63 @@
-
-from dash import Dash, dcc, html, Input, Output, State
-from flask import Flask, render_template, Response
-import dash_bootstrap_components as dbc
-from ultralytics import YOLO
-# from gen_frames import gen_frames_yolo
+import dash
+from dash import html, dcc, Input, Output, State
+from dash.dependencies import Input, Output
 import cv2
-from ultralytics.yolo.utils.plotting import Annotator
-import matplotlib.pyplot as plt
-import random
-import colorsys
+from ultralytics import YOLO
 
+# Initialisation de l'application Dash
+app = dash.Dash(__name__)
 
-
-# Generate unique colors for each label
-def generate_label_colors(num_labels):
-    hsv_colors = [(i / num_labels, 1, 1) for i in range(num_labels)]
-    rgb_colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv_colors))
-    bgr_colors = [(int(r * 255), int(g * 255), int(b * 255)) for (r, g, b) in rgb_colors]
-    return bgr_colors
-
-
+# Chargement du modèle YOLOv8
 model = YOLO("yolov8n.pt")
 
+# Callback pour démarrer la webcam et effectuer la détection d'objets
+@app.callback(
+    Output('detected-objects', 'children'),
+    Input('start-btn', 'n_clicks'),
+    State('webcam-video', 'children')
+)
+def start_webcam(n_clicks, video):
+    if n_clicks is None:
+        return ''
 
+    # Ouvrir la webcam
+    cap = cv2.VideoCapture(0)
 
-cap = cv2.VideoCapture(0)
+    # Boucle pour capturer et traiter chaque image de la webcam
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        # Effectuer la détection d'objets avec YOLOv8
+        results = model(frame)
 
-label_colors = generate_label_colors(len(model.names))
+        # Liste des objets détectés
+        detected_objects = []
+        for r in results:
+            for box in r.boxes:
+                label = model.names[int(box.cls)]
+                detected_objects.append(label)
 
-while cap.isOpened():
-    ret, frame = cap.read()
+        # Convertir la liste en une chaîne de caractères
+        detected_objects_str = ', '.join(detected_objects)
 
-    # model.predict(source="0", show=True)
-    results = model(frame)  # Perform object detection on the frame
-    # print(results)
-    for r in results:
-
-        annotator = Annotator(frame)
-
-        li = []
-        coord = [500, 500, 500, 500]
-        boxes = r.boxes
-        for box in boxes:
-            b = box.xyxy[0]  # get box coordinates in (top, left, bottom, right) format
-            c = box.cls
-            label = model.names[int(c)]  # person, couch, chain in loop
-            color = label_colors[int(c)]
-
-            li.append(label)
-            my_dict = {i: li.count(i) for i in li}
-
-            print(my_dict)
-            print(my_dict.keys())
-            print(my_dict.values())
-
-            annotator.box_label(b, model.names[int(c)], color=color)
-            print(b)
-
-            annotator.box_label(b, model.names[int(c)], color=color)
+        # Afficher la liste des objets détectés dans le html.Div
+        return detected_objects_str
 
 
 
-    frame = annotator.result()
 
-    frame = cv2.imencode('.jpg', frame)[1].tobytes()
+
+
+# Mise en page de l'application Dash
+app.layout = html.Div([
+    html.H1("Détection d'objets avec YOLOv8"),
+    html.Button('Start', id='start-btn', n_clicks=0),
+    html.Div(id='webcam-video'),
+    html.Div(id='detected-objects')
+])
+
+# Lancer l'application Dash
+if __name__ == '__main__':
+    app.run_server(debug=True)
