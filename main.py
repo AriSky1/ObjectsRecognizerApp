@@ -2,11 +2,9 @@ from dash import Dash, dcc, html, Input, Output, State
 from flask import Flask, render_template, Response
 import dash_bootstrap_components as dbc
 from ultralytics import YOLO
-# from gen_frames import gen_frames_yolo
 import cv2
 from ultralytics.yolo.utils.plotting import Annotator
-import matplotlib.pyplot as plt
-import random
+
 import colorsys
 
 model = YOLO("yolov8n.pt")
@@ -25,63 +23,58 @@ def generate_label_colors(num_labels):
 
 def gen_frames_yolo():
 
-
     cap = cv2.VideoCapture(0)
-
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
     label_colors = generate_label_colors(len(model.names))
 
-
-
     while cap.isOpened():
         ret, frame = cap.read()
-
-        # model.predict(source="0", show=True)
         results = model(frame)  # Perform object detection on the frame
-        # print(results)
         for r in results:
-
             annotator = Annotator(frame)
-
             li=[]
-            # coord = [50,300,300,500]
             boxes = r.boxes
             for box in boxes:
                 b = box.xyxy[0]  # get box coordinates in (top, left, bottom, right) format
                 c = box.cls
                 label = model.names[int(c)] #person, couch, chain in loop
                 color = label_colors[int(c)]
-
                 li.append(label)
-                # d = {i: li.count(i) for i in li}
-
-
                 annotator.box_label(b, model.names[int(c)],color=color)
 
             d = {i: li.count(i) for i in li}
 
-            d = str(d)
-            d = d.replace('}', ' ')
-            d = d.replace('{', ' ')
-            d = d.replace("'", ' ')
-            d = d.replace(",", '')
-
-            cv2.putText(frame, str(d), (50,50), cv2.FONT_HERSHEY_DUPLEX,
-                                    0.8, (0, 0, 0), 1, cv2.LINE_AA)
+            d1 = dict(list(d.items())[:3])
+            # new_dic2 = list(d.items())[4:]
+            # new_dic1 = dict(list(d.items())[:4])
+            d2 = dict(list(d.items())[3:])
 
 
+            d1 = str(d1)
+            d2 = str(d2)
 
+            d1 = d1.replace('}', ' ')
+            d1 = d1.replace('{', ' ')
+            d1 = d1.replace("'", ' ')
+            d1 = d1.replace(",", '')
+
+
+            d2 = d2.replace('}', ' ')
+            d2 = d2.replace('{', ' ')
+            d2 = d2.replace("'", ' ')
+            d2 = d2.replace(",", '')
+
+
+            #
+            cv2.putText(frame, str(d1), (10,30), cv2.FONT_HERSHEY_DUPLEX,
+                                    0.9, (0, 0, 0), 1, cv2.LINE_AA)
+            cv2.putText(frame, str(d2), (30,70), cv2.FONT_HERSHEY_DUPLEX,
+                                    0.9, (0, 0, 0), 1, cv2.LINE_AA)
 
         frame = annotator.result()
-
         frame = cv2.imencode('.jpg', frame)[1].tobytes()
-
-
-
-
-
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame  + b'\r\n')
 
 
