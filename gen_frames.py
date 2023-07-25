@@ -1,4 +1,3 @@
-
 from dash import Dash, html, dcc
 import plotly.express as px
 import pandas as pd
@@ -46,5 +45,3 @@ def gen_frames_yolo():
         key = cv2.waitKey(20)
         if key == 27:
             break
-
-

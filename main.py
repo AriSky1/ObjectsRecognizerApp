@@ -2,7 +2,7 @@ from dash import Dash, dcc, html, Input, Output, State
 from flask import Flask, render_template, Response
 import dash_bootstrap_components as dbc
 from ultralytics import YOLO
-from gen_frames import gen_frames_yolo
+# from gen_frames import gen_frames_yolo
 import cv2
 from ultralytics.yolo.utils.plotting import Annotator
 import matplotlib.pyplot as plt
@@ -10,6 +10,9 @@ import random
 import colorsys
 
 model = YOLO("yolov8n.pt")
+
+
+
 
 # Generate unique colors for each label
 def generate_label_colors(num_labels):
@@ -38,16 +41,27 @@ def gen_frames_yolo():
 
             annotator = Annotator(frame)
 
-
+            li=[]
+            # coord = [50,300,300,500]
             boxes = r.boxes
             for box in boxes:
                 b = box.xyxy[0]  # get box coordinates in (top, left, bottom, right) format
                 c = box.cls
-                label = model.names[int(c)]
+                label = model.names[int(c)] #person, couch, chain in loop
                 color = label_colors[int(c)]
+
+                li.append(label)
+                # d = {i: li.count(i) for i in li}
 
 
                 annotator.box_label(b, model.names[int(c)],color=color)
+
+            d = {i: li.count(i) for i in li}
+            cv2.putText(frame, str(d), (50,50), cv2.FONT_HERSHEY_SIMPLEX,
+                                    1, (255, 0, 0), 2, cv2.LINE_AA)
+
+
+
 
         frame = annotator.result()
 
