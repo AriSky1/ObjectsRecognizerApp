@@ -1,0 +1,35 @@
+
+.h1 {
+
+color: grey;
+fontSize: 30;
+text-align :center;
+letter-spacing:2px;
+padding-left: 20px,
+padding-top: 20px
+font_family: Segoe UI,
+padding-top: 100px;
+}
+
+#text_id {
+
+color: grey;
+fontSize: 15;
+textAlign :center;
+letter-spacing:2px;
+padding-left: 20px,
+padding-top: 20px
+font_family: Segoe UI,
+padding-bottom: 100px;
+}
+
+
+
+.btn {
+
+color: grey;
+font-weight: bold;
+ width:100px;
+ height:50px;
+ padding-top:400px;
+}
