@@ -23,7 +23,10 @@ def generate_label_colors(num_labels):
 
 def gen_frames_yolo():
 
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
+
+    cap = cv2.VideoCapture(r'C:\Users\ariai\Documents\Sound recordings\Adobe\stras.mpeg')
+
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
@@ -46,10 +49,10 @@ def gen_frames_yolo():
 
             d = {i: li.count(i) for i in li}
 
-            d1 = dict(list(d.items())[:3])
+            d1 = dict(list(d.items())[:6])
             # new_dic2 = list(d.items())[4:]
             # new_dic1 = dict(list(d.items())[:4])
-            d2 = dict(list(d.items())[3:])
+            d2 = dict(list(d.items())[6:])
 
 
             d1 = str(d1)
@@ -68,10 +71,11 @@ def gen_frames_yolo():
 
 
             #
+            cv2.rectangle(frame, (0, 0), (1500, 100), (0, 0, 0), -1)
             cv2.putText(frame, str(d1), (10,30), cv2.FONT_HERSHEY_DUPLEX,
-                                    0.9, (0, 0, 0), 1, cv2.LINE_AA)
+                                    0.9, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(frame, str(d2), (30,70), cv2.FONT_HERSHEY_DUPLEX,
-                                    0.9, (0, 0, 0), 1, cv2.LINE_AA)
+                                    0.9, (255, 255, 255), 1, cv2.LINE_AA)
 
         frame = annotator.result()
         frame = cv2.imencode('.jpg', frame)[1].tobytes()
@@ -82,11 +86,11 @@ def gen_frames_yolo():
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# external_stylesheets = [dbc.themes.CYBORG]
 
-
-style_title={'color': 'grey','fontSize': 30,'textAlign': 'center', 'letter-spacing':'2px', 'padding-left': '20px','padding-top': '20px'}
-style_text={'color': 'grey','fontSize': 18,'textAlign': 'center','font_family': 'Segoe UI', 'padding-bottom':'20px','padding-left': '20px'}
-style_btn = {'color': 'grey','font-weight': 'bold', 'width':'100px', 'height':'50px',}
+# style_title={'color': 'grey','fontSize': 30,'textAlign': 'center', 'letter-spacing':'2px', 'padding-left': '20px','padding-top': '20px'}
+# style_text={'color': 'grey','fontSize': 18,'textAlign': 'center','font_family': 'Segoe UI', 'padding-bottom':'20px','padding-left': '20px'}
+# style_btn = {'color': 'grey','font-weight': 'bold', 'width':'100px', 'height':'50px',}
 
 server = Flask(__name__)
 app = Dash(__name__, server=server,external_stylesheets=external_stylesheets)
@@ -98,17 +102,19 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.H1(children='Objects Counter', style=style_title),
+                        html.H1('Objects Counter', id='h1', className='h1'),
                         html.Div(
+                            id = 'text_id',
                             children='Count multiple objects from your web cam.',
-                            style=style_text
+
+
                         ),
                         html.Div(
-                            html.Button('Start', id='start_btn', n_clicks=0, className='btn btn-success', style=style_btn),
+                            html.Button('Start', id='start_btn', n_clicks=0, className='btn'),
                             style={'display': 'flex', 'justify-content': 'center', 'margin-bottom': '30px',"background-color": "black"}
                         ),
 
-                        html.Div(id='container-stream', style={'margin':'0px'}),
+                        html.Div(id='container-stream', style={'margin-top':'0px'}),
                         html.Div(id='dict-placeholder'),
 
 
