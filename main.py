@@ -98,9 +98,9 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.H1(children='Objects Recognizer', style=style_title),
+                        html.H1(children='Objects Counter', style=style_title),
                         html.Div(
-                            children='Recognize multiple objects from your live web cam stream.',
+                            children='Count multiple objects from your web cam.',
                             style=style_text
                         ),
                         html.Div(
